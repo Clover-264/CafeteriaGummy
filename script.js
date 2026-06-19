@@ -1,5 +1,5 @@
 const PIX_KEY = "22993525674"; // chave PIX para pagamento
-const PIX_RECEIVER = "Delícias & Gostosuras";
+const PIX_RECEIVER = "Gummy & Gostosuras";
 
 const USE_AI_BACKEND = false; //chatbot usa cérebro local
 
@@ -351,7 +351,7 @@ function setupChatbot() {
     toggle.style.display = "none";
     if (!win.dataset.started) {
       addChatMessage("bot",
-        "Oi! Eu sou o assistente IA da Delícias & Gostosuras :)<br>" +
+        "Oi! Eu sou o assistente IA da Gummy & Gostosuras :)<br>" +
         "Me diga o que você quer pedir em uma frase só que adicionarei o pedido direto em seu carrinho, ex:<br>" +
         "<em>“2 bubble tea de taro, 1 croissant e 1 torta de limão”</em>.");
       win.dataset.started = "1";
