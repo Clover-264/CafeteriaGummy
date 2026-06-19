@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<!--HEAD-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nova senha | Delícias &amp; Gostosuras</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<!--BODY-->
+<body class="auth-page">
+  <div class="auth-card">
+    <h2>Definir nova senha</h2>
+    <p class="subtitle">Esta página abre quando a pessoa clica no link recebido por e-mail.</p>
+    <div id="msg"></div>
+<!--FORMULÁRIO DE REDEFINIÇÃO DE SENHA-->
+    <form id="f">
+      <div class="form-group">
+        <label>Nova senha</label>
+        <input type="password" name="senha" id="s1" required minlength="6" />
+      </div>
+      <div class="form-group">
+        <label>Confirmar senha</label>
+        <input type="password" name="senha2" id="s2" required minlength="6" />
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit">Salvar nova senha</button>
+    </form>
+
+<!--LINKS DE NAVEGAÇÃO-->
+    <div class="auth-links"><p><a href="login.html">← Voltar pro login</a></p></div>
+  </div>
+
+<!--
+OQUE O SCRIPT DEVERIA FAZER:
+1. Pegar o token da URL (ex: redefinir.html?token=abc123)
+2. Verificar se as senhas digitadas são iguais
+3. Enviar a nova senha e o token para o backend (php/reset.php)
+4. Mostrar mensagens de sucesso ou erro com base na resposta do backend  
+-->
+  <script>
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    if (!token) document.getElementById("msg").innerHTML = `<div class="alert alert-error">Token ausente. Abra esta página pelo link do e-mail.</div>`;
+
+    document.querySelectorAll("button, .btn").forEach(btn => {
+      btn.addEventListener("mousemove", (e) => {
+        const r = btn.getBoundingClientRect();
+        btn.style.transform = `translate(${((e.clientX-r.left)/r.width-.5)*8}px, ${((e.clientY-r.top)/r.height-.5)*8}px) scale(1.035)`;
+      });
+      btn.addEventListener("mouseleave", () => btn.style.transform = "translate(0,0) scale(1)");
+    });
+
+    document.getElementById("f").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("msg");
+      if (document.getElementById("s1").value !== document.getElementById("s2").value) {
+        msg.innerHTML = `<div class="alert alert-error">Senhas diferentes</div>`;
+        return;
+      }
+      const data = new FormData(e.target);
+      data.append("token", token || "");
+      try {
+        const res = await fetch("php/reset.php", { method: "POST", body: data });
+        const json = await res.json();
+        if (json.ok) {
+          msg.innerHTML = `<div class="alert alert-success">Senha alterada! Redirecionando...</div>`;
+          setTimeout(() => location.href = "login.html", 1400);
+        } else {
+          msg.innerHTML = `<div class="alert alert-error">${json.error || "Token inválido ou expirado"}</div>`;
+        }
+      } catch (e) {
+        msg.innerHTML = `<div class="alert alert-error">Erro de conexão</div>`;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<!--HEAD-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Delícias & Gostosuras - Bubble Tea, cafés, salgados finos e doces gourmet em Cabo Frio." />
+  <title>Delícias &amp; Gostosuras | Bubble Tea, Salgados Finos &amp; Doces Gourmet</title>
+  <link rel="icon" type="image/x-icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<!--TOPBAR(com promoção de frete e número de contato)-->
+<body>
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span>🚚 Frete grátis acima de R$ 50 em Cabo Frio</span>
+      <span class="hide-mobile">📞 (22) 99352-5674</span>
+    </div>
+  </div>
+
+<!--CABEÇALHO-->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="Voltar para a página inicial">
+        <img class="logo-img" src="img/logo.png" alt="Logo Delícias & Gostosuras" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
+        <span class="logo-fallback" aria-hidden="true">🧋</span>
+        <div>
+          <h1>Delícias &amp; Gostosuras</h1>
+          <small>Bubble Tea • Salgados • Doces</small>
+        </div>
+      </a>
+
+      <div class="search">
+        <input type="text" id="search-input" placeholder="🔍 Buscar no cardápio..." />
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-ghost" id="btn-login" onclick="location.href='login.html'">Entrar</button>
+        <button class="btn btn-primary" id="btn-cadastro" onclick="location.href='cadastro.html'">Cadastrar</button>
+
+        <button class="btn btn-ghost hidden" id="btn-endereco" onclick="location.href='endereco.html'">📍 Meu endereço</button>
+        <span class="user-name hidden" id="user-name"></span>
+        <button class="btn btn-ghost hidden" id="btn-logout">Sair</button>
+
+        <button class="cart-btn" id="cart-btn">
+          🛒 <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+
+<!--FILTRO DE CATEGORIAS-->
+    <nav class="categories">
+      <div class="container cat-inner">
+        <button class="cat-btn active" data-cat="todos">Todos</button>
+        <button class="cat-btn" data-cat="bubble">🧋 Bubble Tea</button>
+        <button class="cat-btn" data-cat="cafe">☕ Cafés</button>
+        <button class="cat-btn" data-cat="salgado">🥐 Salgados</button>
+        <button class="cat-btn" data-cat="torta">🍰 Tortas</button>
+        <button class="cat-btn" data-cat="macaron">🍬 Macarons</button>
+        <button class="cat-btn" data-cat="doce">🍫 Doces</button>
+      </div>
+    </nav>
+  </header>
+
+<!--BANNER-->
+  <section class="hero">
+    <div class="container">
+      <h2>O melhor Bubble Tea de Cabo Frio 🧋</h2>
+      <p>Salgados crocantes, doces gourmet e cafés artesanais, entregamos na sua casa.</p>
+      <a href="#cardapio" class="btn btn-primary btn-lg">Ver cardápio</a>
+    </div>
+  </section>
+
+<!--CARDÁPIO(RENDERIZADO ATRÁVES DO JAVASCRIPT)-->
+  <main class="container" id="cardapio">
+    <h3 class="section-title">Nosso Cardápio</h3>
+    <div class="product-grid" id="product-grid"></div>
+  </main>
+
+<!--SOBRE NÓS-->
+  <section class="about">
+    <div class="container">
+      <h3>Sobre nós</h3>
+      <p>Somos uma cafeteria em Cabo Frio especializada em Bubble Tea, salgados finos e doces gourmet. Tudo feito artesanalmente, com amor.</p>
+      <p>📍 Rua Paratinga, 163 — Cabo Frio/RJ &nbsp; • &nbsp; ⏰ Terça-Domingo / 09h às 20h</p>
+    </div>
+  </section>
+
+<!--RODAPÉ DA PÁGINA-->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 Delícias &amp; Gostosuras - Todos os direitos reservados.</p>
+      <p><a href="https://wa.me/5522993525674" target="_blank" rel="noopener">💬 Fale conosco no WhatsApp</a></p>
+    </div>
+  </footer>
+
+<!--"GAVETA" DO CARRINHO-->
+  <aside class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3>Sua sacola</h3>
+      <button id="cart-close" aria-label="Fechar sacola">✕</button>
+    </div>
+    <div class="cart-body" id="cart-body"></div>
+    <div class="cart-footer">
+      <div class="cart-total">Total: <strong id="cart-total">R$ 0,00</strong></div>
+      <button class="btn btn-primary btn-block" id="checkout-btn">Finalizar pedido</button>
+    </div>
+  </aside>
+  <div class="cart-backdrop" id="cart-backdrop"></div>
+
+<!--JANELA DE FINALIZAÇÃO DE PEDIDO-->
+  <div class="modal" id="checkout-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Finalizar pedido</h3>
+        <button id="checkout-close" aria-label="Fechar checkout">✕</button>
+      </div>
+      <div class="modal-body">
+        <h4>📍 Endereço de entrega</h4>
+        <div id="checkout-address" class="address-box">Carregando...</div>
+
+        <h4>🚚 Tipo de entrega</h4>
+        <label class="radio"><input type="radio" name="delivery" value="entrega" checked> Entrega (R$ 8,00)</label>
+        <label class="radio"><input type="radio" name="delivery" value="retirada"> Retirar na loja (Grátis)</label>
+
+        <h4>💳 Forma de pagamento</h4>
+        <label class="radio"><input type="radio" name="payment" value="pix" checked> PIX</label>
+        <label class="radio"><input type="radio" name="payment" value="credito_online"> Cartão de crédito online</label>
+        <label class="radio"><input type="radio" name="payment" value="debito_online"> Cartão de débito online</label>
+        <label class="radio"><input type="radio" name="payment" value="dinheiro_entrega"> Dinheiro na entrega</label>
+        <label class="radio"><input type="radio" name="payment" value="cartao_entrega"> Cartão na entrega</label>
+
+        <div class="payment-help" id="payment-help"></div>
+
+        <h4>📝 Observações (opcional)</h4>
+        <textarea id="checkout-notes" placeholder="Ex: sem cebola, troco pra R$ 50..."></textarea>
+
+        <div class="checkout-summary">
+          <div>Subtotal: <span id="sum-sub">R$ 0,00</span></div>
+          <div>Frete: <span id="sum-frete">R$ 8,00</span></div>
+          <div class="big">Total: <span id="sum-total">R$ 0,00</span></div>
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg" id="confirm-order">Confirmar pedido</button>
+      </div>
+    </div>
+  </div>
+
+<!--WHATSAPP-->
+  <a class="wa-float"
+     id="wa-float"
+     href="https://wa.me/5522993525674?text=Ol%C3%A1!%20Quero%20fazer%20um%20pedido%20na%20Del%C3%ADcias%20%26%20Gostosuras"
+     target="_blank"
+     rel="noopener"
+     aria-label="Falar no WhatsApp">
+    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+      <path fill="#fff" d="M19.11 17.21c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.16-1.34-.8-.71-1.34-1.59-1.5-1.86-.16-.27-.02-.42.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.02-.22-.53-.45-.46-.61-.47l-.52-.01c-.18 0-.48.07-.73.34-.25.27-.96.94-.96 2.29 0 1.35.98 2.66 1.12 2.84.14.18 1.93 2.95 4.68 4.13.65.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.59-.65 1.82-1.28.23-.63.23-1.17.16-1.28-.07-.12-.25-.18-.52-.32zM16.02 5.33c-5.9 0-10.69 4.79-10.69 10.69 0 1.89.5 3.74 1.44 5.36L5.33 26.67l5.46-1.42c1.57.86 3.35 1.31 5.23 1.31 5.9 0 10.69-4.79 10.69-10.69S21.92 5.33 16.02 5.33zm0 19.55c-1.67 0-3.31-.45-4.74-1.3l-.34-.2-3.24.84.86-3.16-.22-.36c-.94-1.5-1.43-3.22-1.43-5 0-5.04 4.1-9.14 9.14-9.14 2.44 0 4.74.95 6.46 2.68 1.73 1.73 2.68 4.03 2.68 6.46 0 5.04-4.1 9.14-9.14 9.14z"/>
+    </svg>
+  </a>
+
+  <!--CHATBOT-->
+  <section class="chatbot" id="chatbot" aria-label="Assistente IA de pedidos">
+    <button class="chatbot-toggle" id="chatbot-toggle" aria-label="Abrir chat">💬</button>
+    <div class="chatbot-window" id="chatbot-window">
+      <div class="chatbot-header">
+        <strong>🤖 Assistente IA</strong>
+        <button id="chatbot-close" aria-label="Fechar chat">✕</button>
+      </div>
+      <div class="chatbot-messages" id="chatbot-messages"></div>
+      <form class="chatbot-form" id="chatbot-form">
+        <input id="chatbot-input" type="text" placeholder='Ex: "quero 2 bubble tea de taro e 1 croissant"' autocomplete="off" />
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </section>
+
+<!--CONEXÃO COM JS-->
+  <script src="script.js"></script>
+</body>
+</html>

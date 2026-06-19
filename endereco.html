@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<!--HEAD-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu endereço | Delícias &amp; Gostosuras</title>
+  <link rel="icon" type="image/x-icon" href="img/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<!--BODY-->
+<body class="auth-page">
+  <div class="auth-card" style="max-width:620px">
+    <h2>📍 Endereço de entrega</h2>
+    <p class="subtitle">Você pode cadastrar um novo endereço e ver quais já estão salvos.</p>
+
+<!--RENDERIZA OS ENDEREÇOS SALVOS-->
+    <div class="saved-addresses">
+      <h3>Endereços salvos</h3>
+      <div id="address-list">Carregando...</div>
+    </div>
+
+    <div id="msg"></div>
+
+<!--FORMULÁRIO PARA CADASTRAR NOVO ENDEREÇO-->
+    <form id="f">
+      <div class="form-group">
+        <label>CEP</label>
+        <input type="text" name="cep" id="cep" required maxlength="9" placeholder="00000-000" />
+      </div>
+      <div class="form-group">
+        <label>Rua</label>
+        <input type="text" name="rua" id="rua" required />
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="form-group" style="flex:1;min-width:120px">
+          <label>Número</label>
+          <input type="text" name="numero" required />
+        </div>
+        <div class="form-group" style="flex:2;min-width:180px">
+          <label>Complemento</label>
+          <input type="text" name="complemento" placeholder="Apto, bloco..." />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Bairro</label>
+        <input type="text" name="bairro" id="bairro" required />
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="form-group" style="flex:2;min-width:180px">
+          <label>Cidade</label>
+          <input type="text" name="cidade" id="cidade" required />
+        </div>
+        <div class="form-group" style="flex:1;min-width:90px">
+          <label>UF</label>
+          <input type="text" name="uf" id="uf" required maxlength="2" />
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit">Salvar novo endereço</button>
+    </form>
+
+  <!--LINKS DE NAVEGAÇÃO-->
+    <div class="auth-links"><p><a href="index.html">← Voltar pra loja</a></p></div>
+  </div>
+
+
+<!--SCRIPT PEGA OS ENDEREÇOS SALVOS E INCLUI ACIMA DO FORMULÁRIO-->
+  <script>
+    function enableMotion() {
+      document.querySelectorAll("button, .btn").forEach(btn => {
+        if (btn.dataset.motionReady) return;
+        btn.dataset.motionReady = "1";
+        btn.addEventListener("mousemove", (e) => {
+          const r = btn.getBoundingClientRect();
+          btn.style.transform = `translate(${((e.clientX-r.left)/r.width-.5)*8}px, ${((e.clientY-r.top)/r.height-.5)*8}px) scale(1.035)`;
+        });
+        btn.addEventListener("mouseleave", () => btn.style.transform = "translate(0,0) scale(1)");
+      });
+    }
+    async function loadAddresses() {
+      const list = document.getElementById("address-list");
+      try {
+        const res = await fetch("php/get_addresses.php");
+        const json = await res.json();
+        if (!json.ok) {
+          list.innerHTML = `<div class="alert alert-error">${json.error || "Faça login para ver seus endereços."}</div>`;
+          return;
+        }
+        if (!json.addresses.length) {
+          list.innerHTML = `<p style="color:var(--muted)">Nenhum endereço salvo ainda.</p>`;
+          return;
+        }
+        list.innerHTML = json.addresses.map(a => `
+          <div class="address-item">
+            <strong>${a.rua}, ${a.numero}</strong><br>
+            ${a.complemento ? a.complemento + "<br>" : ""}
+            ${a.bairro} — ${a.cidade}/${a.uf}<br>
+            CEP ${a.cep}
+          </div>
+        `).join("");
+      } catch (e) {
+        list.innerHTML = `<div class="alert alert-error">Erro ao carregar endereços.</div>`;
+      }
+    }
+
+    document.getElementById("cep").addEventListener("blur", async (e) => {
+      const cep = e.target.value.replace(/\D/g, "");
+      if (cep.length !== 8) return;
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const d = await res.json();
+        if (d.erro) return;
+        document.getElementById("rua").value = d.logradouro || "";
+        document.getElementById("bairro").value = d.bairro || "";
+        document.getElementById("cidade").value = d.localidade || "";
+        document.getElementById("uf").value = d.uf || "";
+      } catch (e) {}
+    });
+
+    document.getElementById("f").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      const msg = document.getElementById("msg");
+      try {
+        const res = await fetch("php/save_address.php", { method: "POST", body: data });
+        const json = await res.json();
+        if (json.ok) {
+          msg.innerHTML = `<div class="alert alert-success">Endereço salvo!</div>`;
+          e.target.reset();
+          loadAddresses();
+        } else {
+          msg.innerHTML = `<div class="alert alert-error">${json.error || "Erro"}</div>`;
+        }
+      } catch (e) {
+        msg.innerHTML = `<div class="alert alert-error">Erro de conexão</div>`;
+      }
+    });
+
+    loadAddresses();
+    enableMotion();
+  </script>
+</body>
+</html>

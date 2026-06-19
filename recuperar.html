@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<!--HEAD-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recuperar senha | Delícias &amp; Gostosuras</title>
+  <link rel="icon" type="image/x-icon" href="img/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<!--BODY -->
+<body class="auth-page">
+  <div class="auth-card">
+    <h2>Recuperar senha</h2>
+    <p class="subtitle">Digite seu e-mail. O sistema gera um link para você criar uma nova senha.</p>
+    <div id="msg"></div>
+
+<!--FORMULÁRIO PARA RECUPERAR SENHA-->
+    <form id="f">
+      <div class="form-group">
+        <label>E-mail cadastrado</label>
+        <input type="email" name="email" required />
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit">Enviar link</button>
+    </form>
+
+    <!--LINKS DE NAVEGAÇÃO-->
+    <div class="auth-links"><p><a href="login.html">← Voltar pro login</a></p></div>
+  </div>
+
+<!--
+OQUE O SCRIPT DEVERIA FAZER:
+1- Envia para `php/forgot.php`
+2- Backend gera um token 
+3- Grava na tabela "password_resets"
+4- Envia o e-mail
+-->
+  <script>
+    document.querySelectorAll("button, .btn").forEach(btn => {
+      btn.addEventListener("mousemove", (e) => {
+        const r = btn.getBoundingClientRect();
+        btn.style.transform = `translate(${((e.clientX-r.left)/r.width-.5)*8}px, ${((e.clientY-r.top)/r.height-.5)*8}px) scale(1.035)`;
+      });
+      btn.addEventListener("mouseleave", () => btn.style.transform = "translate(0,0) scale(1)");
+    });
+
+    document.getElementById("f").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      const msg = document.getElementById("msg");
+      try {
+        const res = await fetch("php/forgot.php", { method: "POST", body: data });
+        const json = await res.json();
+        if (json.ok) {
+          let extra = "";
+          if (json.debug_link) {
+            extra = `<p style="margin-top:8px"><strong>Modo teste:</strong> <a href="${json.debug_link}">clique aqui para redefinir</a></p>`;
+          }
+          msg.innerHTML = `<div class="alert alert-success">Se este e-mail existir, o link foi gerado. Confira entrada e spam.${extra}</div>`;
+        } else {
+          msg.innerHTML = `<div class="alert alert-error">${json.error || "Erro"}</div>`;
+        }
+      } catch (e) {
+        msg.innerHTML = `<div class="alert alert-error">Erro de conexão</div>`;
+      }
+    });
+  </script>
+</body>
+</html>

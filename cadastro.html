@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<!--HEAD-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro | Delícias &amp; Gostosuras</title>
+  <link rel="icon" type="image/x-icon" href="img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<!--BODY-->
+<body class="auth-page">
+  <div class="auth-card">
+    <h2>Criar conta</h2>
+    <p class="subtitle">Cadastre-se para finalizar pedidos pelo site.</p>
+    <div id="msg"></div>
+
+<!--FORMULÁRIO DE CADASTRO-->
+    <form id="cad-form">
+      <div class="form-group">
+        <label>Nome de usuário</label>
+        <input type="text" name="nome" required minlength="2" maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" name="email" required maxlength="120" />
+      </div>
+      <div class="form-group">
+        <label>Celular</label>
+        <input type="tel" name="telefone" required placeholder="(22) 99999-9999" />
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" name="senha" id="s1" required minlength="6" />
+      </div>
+      <div class="form-group">
+        <label>Confirmar senha</label>
+        <input type="password" name="senha2" id="s2" required minlength="6" />
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit">Cadastrar</button>
+    </form>
+
+<!--LINKS DE NAVEGAÇÃO-->
+    <div class="auth-links">
+      <p>Já tem conta? <a href="login.html">Entrar</a></p>
+      <p><a href="index.html">← Voltar pra loja</a></p>
+    </div>
+  </div>
+
+<!--SCRIPT CONFERE SE AS DUAS SENHAS BATEM E ENVIA PARA O CADASTRO DE ENDEREÇO-->
+  <script>
+    document.querySelectorAll("button, .btn").forEach(btn => {
+      btn.addEventListener("mousemove", (e) => {
+        const r = btn.getBoundingClientRect();
+        btn.style.transform = `translate(${((e.clientX-r.left)/r.width-.5)*8}px, ${((e.clientY-r.top)/r.height-.5)*8}px) scale(1.035)`;
+      });
+      btn.addEventListener("mouseleave", () => btn.style.transform = "translate(0,0) scale(1)");
+    });
+
+    document.getElementById("cad-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("msg");
+      if (document.getElementById("s1").value !== document.getElementById("s2").value) {
+        msg.innerHTML = `<div class="alert alert-error">As senhas não coincidem</div>`;
+        return;
+      }
+      const data = new FormData(e.target);
+      try {
+        const res = await fetch("php/register.php", { method: "POST", body: data });
+        const json = await res.json();
+        if (json.ok) {
+          msg.innerHTML = `<div class="alert alert-success">Cadastro feito! Agora cadastre seu endereço.</div>`;
+          setTimeout(() => location.href = "endereco.html", 1200);
+        } else {
+          msg.innerHTML = `<div class="alert alert-error">${json.error || "Erro"}</div>`;
+        }
+      } catch (e) {
+        msg.innerHTML = `<div class="alert alert-error">Erro de conexão</div>`;
+      }
+    });
+  </script>
+</body>
+</html>
